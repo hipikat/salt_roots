@@ -5,5 +5,6 @@
 base:
   '*':
     - packages
+    - python
     - users
     - projects
