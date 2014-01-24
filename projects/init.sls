@@ -21,12 +21,18 @@ include:
     - mode: 444
 
 # TODO: Let projects specify system package requirements.
-# First line is for pillow, second line's for postgresql
+# First line is for pillow.
+# Second line's for postgresql.
+# Third-line's for uWSGI routing support.
+# Supervisor is used to manage uWSGI processes.
+# apache2-utils is requied to generate htpasswd files.
 {% set postgres_pkg = 'postgresql-9.1' %}
 {% for system_pkg in (
   'python-dev', 'python-setuptools',
   postgres_pkg, 'python-psycopg2', 'libpq-dev',
+  'libssl-dev', 'libpcre3-dev',
   'supervisor',
+  'apache2-utils',
 ) %}
 {{ system_pkg }}:
   pkg.installed
@@ -78,20 +84,6 @@ include:
     - require:
       - pkg: {{ postgres_pkg }}
 {% endfor %}
-
-{% for user in project.get('db_admins', []): %}
-{{ deploy_name }}-no-db-user:
-  postgres_user.absent:
-    - name: {{ user }}
-{% endfor %}
-#{% for user in project.get('db_admins', []): %}
-#{{ deploy_name }}-db_user-{{ user }}:
-#  postgres_user.present:
-#    # TODO: Work out how to do postgres groups etc. properly in Salt
-#    - superuser: true
-#    - password: insecure
-#    - name: {{ user }}
-#{% endfor %}
 
 # Envdir (flat files whose names/contents form environment keys/values)
 {% if 'envdir' in project and 'env' in project: %}
@@ -151,13 +143,36 @@ include:
     - template: jinja
     - context:
         program_name: {{ deploy_name }}
-        wsgi_module: {{ project['wsgi_module'] }}
-        settings_module: {{ project['settings_module'] }}
         uwsgi_bin: /opt/venv/{{ deploy_name }}/bin/uwsgi
+        uwsgi_ini: /opt/venv/{{ deploy_name }}/etc/uwsgi.ini
+        #wsgi_module: {{ project['wsgi_module'] }}
+        #settings_module: {{ project['settings_module'] }}
+        # TODO: Remove this assumption about project-local var/log dirs...
+        #socket: /opt/proj/{{ deploy_name }}/var/uwsgi.sock
+        #uwsgi_log: /opt/proj/{{ deploy_name }}/var/log/uwsgi.log
+        #virtualenv: /opt/venv/{{ deploy_name }}
+
+/opt/venv/{{ deploy_name }}/etc:
+  file.directory:
+    - mode: 755
+
+/opt/venv/{{ deploy_name }}/etc/uwsgi.ini:
+  file.managed:
+    - source: salt://projects/templates/uwsgi-master.ini
+    - mode: 444
+    - makedirs: True
+    - template: jinja
+    - context:
+        #uwsgi_bin: /opt/venv/{{ deploy_name }}/bin/uwsgi
+        basicauth: {{ project.get('http_basic_auth', false) }}
+        realm: {{ deploy_name }}
+        htpasswd_file: /etc/nginx/auth/{{ deploy_name }}.htpasswd
         # TODO: Remove this assumption about project-local var/log dirs...
         socket: /opt/proj/{{ deploy_name }}/var/uwsgi.sock
-        uwsgi_log: /opt/proj/{{ deploy_name }}/var/log/uwsgi.log
+        wsgi_module: {{ project['wsgi_module'] }}
+        settings_module: {{ project['settings_module'] }}
         virtualenv: /opt/venv/{{ deploy_name }}
+        uwsgi_log: /opt/proj/{{ deploy_name }}/var/log/uwsgi.log
 
 supervisor-update-{{ deploy_name }}:
   module.wait:
@@ -185,7 +200,8 @@ run-{{ deploy_name }}-uwsgi:
         project_root: /opt/proj/{{ deploy_name }}
         upstream_server: unix:///opt/proj/{{ deploy_name }}/var/uwsgi.sock
         port: {{ project['port'] }}
-        servers: {{ project['nginx_servers'] }}
+        servers: {{ project['servers'] }}
+        http_basic_auth: {{ project.get('http_basic_auth', false) }}
 
 {% if project.get('enabled', false) %}
 {{ deploy_name }}-nginx:
@@ -197,6 +213,21 @@ run-{{ deploy_name }}-uwsgi:
   file.symlink:
     - name: /etc/nginx/sites-enabled/{{ deploy_name }}.conf
     - target: /etc/nginx/sites-available/{{ deploy_name }}.conf
+{% endif %}
+
+# HTTP Basic Authentication
+{% if project.get('http_basic_auth', false) %}
+{% for user in project.get('admins', []) %}
+{{ deploy_name }}-{{ user }}-http_basic_auth:
+  file.append:
+    - name: /etc/nginx/auth/{{ deploy_name }}.htpasswd
+    - text: {{ user }}:{{ pillar['users'][user]['htpasswd'] }}
+    - makedirs: true
+{% endfor %}
+
+/etc/nginx/auth/{{ deploy_name }}.htpasswd:
+  file.managed:
+    - mode: 440
 {% endif %}
 
 
