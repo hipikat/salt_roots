@@ -11,10 +11,6 @@ include:
   - python
   - nginx
 
-/etc/nginx/sites-enabled/default:
-  file:
-    - absent
-
 /etc/nginx/uwsgi_params:
   file.managed:
     - source: salt://projects/templates/uwsgi_params
@@ -145,16 +141,22 @@ include:
         program_name: {{ deploy_name }}
         uwsgi_bin: /opt/venv/{{ deploy_name }}/bin/uwsgi
         uwsgi_ini: /opt/venv/{{ deploy_name }}/etc/uwsgi.ini
-        #wsgi_module: {{ project['wsgi_module'] }}
-        #settings_module: {{ project['settings_module'] }}
-        # TODO: Remove this assumption about project-local var/log dirs...
-        #socket: /opt/proj/{{ deploy_name }}/var/uwsgi.sock
-        #uwsgi_log: /opt/proj/{{ deploy_name }}/var/log/uwsgi.log
-        #virtualenv: /opt/venv/{{ deploy_name }}
 
 /opt/venv/{{ deploy_name }}/etc:
   file.directory:
     - mode: 755
+
+/opt/venv/{{ deploy_name }}/var/log:
+  file.directory:
+    - makedirs: True
+
+/opt/venv/{{ deploy_name }}/var:
+  file.directory:
+    - user: www-data
+    - mode: 770
+    - recurse:
+      - user
+      - mode
 
 /opt/venv/{{ deploy_name }}/etc/uwsgi.ini:
   file.managed:
@@ -163,16 +165,14 @@ include:
     - makedirs: True
     - template: jinja
     - context:
-        #uwsgi_bin: /opt/venv/{{ deploy_name }}/bin/uwsgi
         basicauth: {{ project.get('http_basic_auth', false) }}
         realm: {{ deploy_name }}
-        htpasswd_file: /etc/nginx/auth/{{ deploy_name }}.htpasswd
-        # TODO: Remove this assumption about project-local var/log dirs...
-        socket: /opt/proj/{{ deploy_name }}/var/uwsgi.sock
+        htpasswd_file: /opt/venv/{{ deploy_name }}/etc/{{ deploy_name }}.htpasswd
+        socket: /opt/venv/{{ deploy_name }}/var/uwsgi.sock
         wsgi_module: {{ project['wsgi_module'] }}
         settings_module: {{ project['settings_module'] }}
         virtualenv: /opt/venv/{{ deploy_name }}
-        uwsgi_log: /opt/proj/{{ deploy_name }}/var/log/uwsgi.log
+        uwsgi_log: /opt/var/{{ deploy_name }}/var/log/uwsgi.log
 
 supervisor-update-{{ deploy_name }}:
   module.wait:
@@ -220,13 +220,14 @@ run-{{ deploy_name }}-uwsgi:
 {% for user in project.get('admins', []) %}
 {{ deploy_name }}-{{ user }}-http_basic_auth:
   file.append:
-    - name: /etc/nginx/auth/{{ deploy_name }}.htpasswd
+    - name: /opt/venv/{{ deploy_name }}/etc/{{ deploy_name }}.htpasswd
     - text: {{ user }}:{{ pillar['users'][user]['htpasswd'] }}
     - makedirs: true
 {% endfor %}
 
-/etc/nginx/auth/{{ deploy_name }}.htpasswd:
+/opt/venv/{{ deploy_name }}/etc/{{ deploy_name }}.htpasswd:
   file.managed:
+    - owner: www-data
     - mode: 440
 {% endif %}
 
