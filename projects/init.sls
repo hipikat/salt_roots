@@ -115,13 +115,19 @@ include:
 {% endif %}
 
 # Post-install hooks
+# TODO: Work out why the hell the onlyif clause isn't working.
 {% if 'post_install' in project: %}
-{% for hook in project['post_install']: %}
-{{ deploy_name }}-post_install-{{ hook }}:
+{% for hook_name, hook in project['post_install'].iteritems(): %}
+{% set cwd = '/opt/proj/' ~ deploy_name %}
+{{ deploy_name }}-post_install-{{ hook['run'] }}:
   cmd.run:
-    - cwd: /opt/proj/{{ deploy_name }}
-    - name: {{ hook }}
+    - cwd: {{ cwd }}
+    - name: {{ hook['run'] }}
     - user: root
+{% if 'onlyif' in hook %}
+    - onlyif:
+      - {{ hook['onlyif']|replace('%cwd%', cwd) }}
+{% endif %}
 {% endfor %}
 {% endif %}
 
