@@ -13,7 +13,8 @@ python-pip:
   'yolk',
 ) %}
 {{ system_python_pkg }}:
-  pip.installed:
+  pip:
+    - installed
     - require:
       - pkg: python-pip
 {% endfor %}
@@ -37,4 +38,4 @@ python-pip:
     - mode: 444 
     - source: salt://python/init_virtualenvwrapper.sh
     - require:
-      - pip.installed: virtualenvwrapper
+      - pip: virtualenvwrapper
