@@ -2,10 +2,13 @@
 ##########################################
 
 # Standard Debian/Ubuntu packages
-global_pkgs:
+required_sys_pkgs:
   pkg.installed:
     - pkgs:
-      - exuberant-ctags   # Parsing code in Vim
       - git               # Version control
+
+useful_sys_pkgs:
+  pkg.installed:
+      - exuberant-ctags   # Parsing code in Vim
       - mosh              # Persistent ssh sessions
       - screen            # Terminal window management
