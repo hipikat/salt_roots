@@ -5,6 +5,8 @@
 base:
   '*':
     - packages
-    - python
     - users
-    - projects
+
+  'wsgi_still:enabled:True':
+    - match: pillar
+    - wsgi_still
