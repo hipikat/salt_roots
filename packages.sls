@@ -5,5 +5,5 @@
 required_sys_pkgs:
   pkg.installed:
     - pkgs:
-      - language-pack-en
-      - git       # Version control
+      - language-pack-en  # Magic-away locale warnings
+      - git               # Version control
