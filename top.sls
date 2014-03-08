@@ -7,6 +7,10 @@ base:
     - packages
     - users
 
+  # Salt masters
+  'mr-*':
+    - saltlick
+
   'chippery:enabled:True':
     - match: pillar
     - chippery
