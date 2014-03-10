@@ -4,13 +4,15 @@
 
 base:
   '*':
-    - packages
+    - sys_packages
     - users
 
   # Salt masters
   'mr-*':
     - saltlick
 
+  # Chippery is an integrated set of formulas for configuring
+  # development and production web stacks from top to bottom.
   'chippery:enabled:True':
     - match: pillar
     - chippery
