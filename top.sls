@@ -1,18 +1,28 @@
-### Top-level SaLt State - map state modules to minions
-### http://docs.saltstack.com/ref/states/top.html
-##########################################
+#
+# Top-level SaLt State - maps state modules to minions
+########################################################################
 
 base:
   '*':
-    - sys_packages
+    # Admin users with shell access
     - users
 
-  # Salt masters
   'mr-*':
+    - match: pcre
+    # Super-master configurator. Syncs salt roots, formulas, pillars, etc.
+    # and sets up salt-cloud providers (etc.) from a 'secrets' pillar.
+    #'saltlick:enabled:True':
     - saltlick
+    # Install admin users' dotfiles and requested system & python packages.
+    - homeboy
 
-  # Chippery is an integrated set of formulas for configuring
-  # development and production web stacks from top to bottom.
+  # Instances of maps syndicated by Chippery projects
+  'chippery:syndicated:True':
+    - match: grain
+    - homeboy
+
+  # Chippery is a set of integrated formulas for configuring & commissioning
+  # WSGI-based projects, for development and production.
   'chippery:enabled:True':
     - match: pillar
     - chippery
