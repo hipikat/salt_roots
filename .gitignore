@@ -1,4 +1,10 @@
+# Secrets
+deploy_keys/*
+
+# Formulas
 chippery
+git-server
 homeboy
+nginx
 saltlick
 users
