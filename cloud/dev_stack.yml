@@ -1,0 +1,33 @@
+
+#stateful-dev-stem-512M:
+stateful-stem:
+  - dev-web-front:
+      minion:
+        grains:
+          chippery/roles:
+            - varnish
+            - redis
+
+  - dev-apps:
+      minion:
+        grains:
+          chippery/roles:
+            - nginx
+            - apps
+            - static
+            - media
+ 
+  - dev-apps-replica:
+      minion:
+        grains:
+          chippery/roles:
+            - nginx
+            - apps
+            - static
+            - media
+
+  - dev-databases:
+      minion:
+        grains:
+          chippery/roles:
+            - databases
