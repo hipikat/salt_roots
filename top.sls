@@ -6,14 +6,8 @@ base:
 
   # All minions under our control
   '*':
-    # Ubiquitous states
-    #- common
-    # Install any 'system_packages' and 'system_python_packages' in pillars
-    - system.system_packages
-    # Make 'MAX_LINE_LENGTH = 99' in the module responsible for Python style
-    - system.pep8-linelength99
-    # Set timezone to Australia/Perth
-    - system.tz-australia-perth
+    # System-level state formulas
+    - system.all
     # Admin users with shell accounts
     - users
 
