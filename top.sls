@@ -3,21 +3,16 @@
 ########################################################################
 
 base:
-
   # All minions under our control
   '*':
-    # System-level state formulas
-    - system.all
-    # Admin users with shell accounts
-    - users
-    # Install admin users' dotfiles and requested system & Python packages
-    - homeboy
+    - system.all    # System-level state formulas
+    - users         # Admin users with shell accounts
+    - homeboy       # Install admins' dotfiles & preferred packages
 
   # Salt masters
   'hrm-*|mx-*':
     - match: pcre
-    # Saltlick installs Salt, roots, formulas, pillars, etc., from pillars
-    - saltlick
+    - saltlick      # Install Salt, roots, formulas, pillars, etc.
 
   # Integrated formulas for installing WSGI (etc.) projects from pillars
   'chippery:enabled:True':
