@@ -5,9 +5,13 @@
 base:
   # All minions under our control
   '*':
-    - system.all    # System-level state formulas
-    - users         # Admin users with shell accounts
-    - homeboy       # Install admins' dotfiles & preferred packages
+    # System-level state formulas
+    - system.all_states
+    - system.patches.pep8-linelength99
+    # Admin users with shell accounts
+    - users
+    # Install admin users' dotfiles and requested system & Python packages
+    - homeboy
 
   # Salt masters
   'hrm-*|mx-*':
