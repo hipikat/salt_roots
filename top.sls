@@ -1,32 +1,46 @@
 #
 # Top-level SaLt State - maps state modules to minions
 ########################################################################
+#
+# Compound matcher quick reference:
+#
+# G *   Grains glob
+# E     PCRE minion ID
+# P *   Grains PCRE
+# L     List of minions
+# I *   Pillar glob
+# J *   Pillar PCRE
+# S     Subnet/IP address
+# R     Range cluster
+# 
+# '*' Indicates an alternative delimiter to ':' may
+# be specified between the letter and '@' character.
 
 base:
-  # All minions under our control
+  # Ubiquitous states/formulas
   '*':
     # System-level state formulas
-    - system.all_states
-    - system.patches.pep8-linelength99
-    # Admin users with shell accounts
+    - system.state.packages
+    - system.state.swapfile
+    - system.state.timezone
+
+    # System user accounts
     - users
-    # Install admin users' dotfiles and requested system & Python packages
-    - homeboy
+    - homeboy     # Install dotfiles and packages for system administrators
 
-  # Salt masters
-  'hrm-*|mx-*':
-    - match: pcre
-    - saltlick      # Install Salt, roots, formulas, pillars, etc.
 
-  # Integrated formulas for installing WSGI (etc.) projects from pillars
-  'chippery:enabled:True':
-    - match: pillar
-    - chippery
+  # Activate simple formulas on the existence of matching grains or pillars
+  {% for formula in (
+    'saltlick',
+    'httpbin',
+    'uwsgi_emperor',
+  ) %}
+  '@G:{{ formula }} or @P:{{ formula }}':
+    - {{ formula }}
+  {% endfor %}
 
-  # A personal utility box and general master controller/hub/home/den/kennel
-  'mr-bones':
-    - git-server
 
-  # Nedsaver.org campaign website
-  'nedsaver.org':
-    - homeboy
+  # 
+  'P@cluster_rank:sovereign or P@cluster_rank:noble':
+    - salt-formula
+    - gitlab
