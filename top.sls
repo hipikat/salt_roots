@@ -20,12 +20,12 @@ base:
   # Ubiquitous states/formulas
   '*':
     # System-level state formulas
+    - salt-formula
     - system.state.packages
     - system.state.swapfile
     - system.state.timezone
 
-    # System user accounts
-    - users
+    - users       # System user accounts
     - homeboy     # Install dotfiles and packages for system administrators
 
 
@@ -33,14 +33,7 @@ base:
   {% for formula in (
     'saltlick',
     'httpbin',
-    'uwsgi_emperor',
   ) %}
   '@G:{{ formula }} or @P:{{ formula }}':
     - {{ formula }}
   {% endfor %}
-
-
-  # 
-  'P@cluster_rank:sovereign or P@cluster_rank:noble':
-    - salt-formula
-    - gitlab
