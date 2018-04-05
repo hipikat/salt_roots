@@ -20,7 +20,6 @@ base:
   # Ubiquitous states/formulas
   '*':
     # System-level state formulas
-    - salt-formula
     - system.state.packages
     - system.state.swapfile
     - system.state.timezone
