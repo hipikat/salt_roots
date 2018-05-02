@@ -1,12 +1,2 @@
-# Secrets
-deploy_keys/*
-
-# Formulas
-chippery
-git-server
-homeboy
-nginx
-saltlick
-shoaler
-system
-users
+# Symlink to salt-formula/salt
+salt
