@@ -26,7 +26,7 @@ base:
 
     - users       # System user accounts
     - homeboy     # Install dotfiles and packages for system administrators
-    - nvm.source  # Node Version Manager
+   #- nvm.source  # Node Version Manager
 
     - fix.all     # Corrections, like owners or permission that may slip
 
