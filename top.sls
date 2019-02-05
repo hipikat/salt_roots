@@ -19,16 +19,17 @@
 base:
   # Ubiquitous states/formulas
   '*':
+
     # System-level state formulas
-    - system.packages
     - system.swapfile
+    - system.packages
     - system.timezone
 
-    - users       # System user accounts
-    - homeboy     # Install dotfiles and packages for system administrators
+   #- users       # System user accounts
+   #- homeboy     # Install dotfiles and packages for system administrators
    #- nvm.source  # Node Version Manager
 
-    - fix.all     # Corrections, like owners or permission that may slip
+   #- fix.all     # Corrections, like owners or permission that may slip
 
 
   # Activate simple formulas on the existence of matching grains or pillars
