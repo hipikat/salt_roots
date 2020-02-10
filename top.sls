@@ -20,27 +20,17 @@ base:
   # Ubiquitous states/formulas
   '*':
     # System-level state formulas
-    - system.state.packages
-    - system.state.swapfile
-    - system.state.timezone
+    - system.packages
+    - system.swapfile
+    - system.timezone
 
     # System user accounts
     - users
     - homeboy     # Install dotfiles and packages for system administrators
 
-
-  # Activate simple formulas on the existence of matching grains or pillars
-  {% for formula in (
-    'saltlick',
-    'httpbin',
-    'uwsgi_emperor',
-  ) %}
-  '@G:{{ formula }} or @P:{{ formula }}':
-    - {{ formula }}
-  {% endfor %}
-
-
-  # 
-  'P@cluster_rank:sovereign or P@cluster_rank:noble':
-    - salt-formula
-    - gitlab
+    # "Yes, Salt can Salt itself!"
+    # https://github.com/saltstack-formulas/salt-formula/
+    # (Note: probably not desirable in top.sls)
+    #- salt.master
+    #- salt.minion
+    #- salt.formulas
