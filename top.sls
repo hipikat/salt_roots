@@ -28,6 +28,10 @@ base:
     - users
     - homeboy     # Install dotfiles and packages for system administrators
 
+    # Basic web-serving services
+    - nginx
+    - php
+
     # "Yes, Salt can Salt itself!"
     # https://github.com/saltstack-formulas/salt-formula/
     # (Note: probably not desirable in top.sls)
