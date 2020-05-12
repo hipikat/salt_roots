@@ -1,12 +1,6 @@
 # Secrets
 deploy_keys/*
 
-# Formulas
-chippery
-git-server
-homeboy
-nginx
-saltlick
-shoaler
-system
-users
+#Created at install-time
+_modules
+_states

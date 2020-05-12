@@ -20,13 +20,18 @@ base:
   # Ubiquitous states/formulas
   '*':
     # System-level state formulas
-    - system.packages
     - system.swapfile
+    - system.packages
+    - system.symlinks
     - system.timezone
 
-    # System user accounts
+    # Local system stuff
     - users
     - homeboy     # Install dotfiles and packages for system administrators
+    - local
+
+    # System services
+    - vsftpd
 
     # Basic web-serving services
     - nginx
