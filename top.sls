@@ -22,7 +22,7 @@ base:
     # System-level state formulas
     - system.swapfile
     - system.packages
-    - system.symlinks
+    - system.filesystem
     - system.timezone
 
     # Local system stuff
