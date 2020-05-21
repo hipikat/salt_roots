@@ -35,7 +35,7 @@ base:
     - nginx
     - letsencrypt
 
-  # Application-specific and standalone service matching
+  # Application-specific and standalone-service matching
   'G@services:mysql:True G@services:wordpress:True':
     - mysql
 
