@@ -27,11 +27,21 @@ base:
 
     # Local system stuff
     - users
-    - homeboy     # Install dotfiles and packages for system administrators
+    - homeboy     # Install dotfiles and packages for system admins
 
-    # System services
-    - vsftpd
 
-    # Basic web-serving services
+  # Basic web-serving capabilities
+  'G@services:web:True or G@services:wordpress:True':
     - nginx
+    - letsencrypt
+
+  # Application-specific and standalone service matching
+  'G@services:mysql:True G@services:wordpress:True':
+    - mysql
+
+  'G@services:php:True G@services:wordpress:True':
     - php
+
+  'G@services:vsftpd:True G@services:wordpress:True':
+    - vsftpd      # Look, Wordpress likes to do FTP over SSL for their
+                  # updates, and who am I to try to stop them?
