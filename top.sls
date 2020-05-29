@@ -18,7 +18,7 @@
 
 base:
   # Ubiquitous states/formulas
-  '*':
+  'G@kernel:Linux':
     # System-level state formulas
     - system.swapfile
     - system.packages
